@@ -16,9 +16,8 @@ public class Piece extends FilledOval {
 
     private DrawingCanvas canvas;
 
-    public boolean capture;
 
-    private boolean onBoard = true;
+    private boolean onBoard = true, hasCaptured = false;
     //if the piece is still alive in the game
     //will be changed to false when it is taken
 
@@ -36,6 +35,7 @@ public class Piece extends FilledOval {
         super.removeFromCanvas();
 
         this.circle = new FilledOval(loc,size,size,canvas);
+        //kingCircle = new FilledOval(loc, size/2, size/2, canvas);
         if (value == 1) {
             this.circle.setColor(Color.RED);
         }
@@ -44,6 +44,9 @@ public class Piece extends FilledOval {
             this.circle.setColor(Color.GRAY);
         }
 
+        kingCircle = new FilledOval(loc, 6*size/11.0, 6*size/11.0, canvas);
+        kingCircle.setColor(Color.ORANGE);
+        kingCircle.hide();
 
 
 
@@ -99,6 +102,10 @@ public class Piece extends FilledOval {
     public FilledOval getCircle() {
         return circle;
     }
+    
+    public FilledOval getKingCircle() {
+        return kingCircle;
+    }
 
 
     //--------------------------------------------------------------------------------------------------------
@@ -138,6 +145,11 @@ public class Piece extends FilledOval {
     public void setColor(Color c) {
         circle.setColor(c);
     }
+    
+    public void king() {
+    			value += 2;
+    			kingCircle.show();
+    }
 
     public void moveTo(Square[][] squares, int row, int col) {
         //Col is x, row is Y
@@ -152,10 +164,17 @@ public class Piece extends FilledOval {
         setLoc(col * size, row * size);//squares[row][col].getRow(), squares[row][col].getCol());
 
         circle.moveTo(col * size - size, row * size - size);
+        kingCircle.moveTo((col * size - size) + circle.getWidth()/2.0 - kingCircle.getWidth()/2.0, (row * size - size) + circle.getHeight()/2.0 - kingCircle.getHeight()/2.0);
 
         //sets the value of the square using the piece on the square
         squares[row][col].setValue(value);
         squares[row][col].setPiece(this);
+        
+        if (value == 1 && row == 8)
+        		this.king();
+        else if (value == 2 && row == 1)
+        		this.king();
+        
     }
 
     public static void startingPos(Piece[][] pieces, Square[][] squares) {
@@ -219,48 +238,27 @@ public class Piece extends FilledOval {
         value = 0;
         squaresArray[row][col].setValue(0);
         circle.removeFromCanvas();
+        kingCircle.removeFromCanvas();
     }
 
     public boolean hasCaptured(){
-        return capture;
+        return hasCaptured;
     }
 
     public boolean isValidMove(Square squares, Square[][] squaresArray) {
-        capture = false;
+        
 
         int rowDif = row - squares.getRow(), colDif = col - squares.getCol();
         System.out.println("Row dif is " + rowDif + ", col dif is " + colDif);
         //if the square is not empty, you cannot move there!!!
         if (squares.getValue() != 0) {
-            //System.out.println(rowDif);
-            //System.out.println(colDif);
-            //System.out.println("AAA");
             return false;
         }
 
         //if the move is directly vertical or horizontal, it is illegal
         if (rowDif == 0 || colDif == 0) {
-            //System.out.println(rowDif);
-            //System.out.println(colDif);
-            //System.out.println("BBB");
             return false;
         }
-
-
-
-        //System.out.println("total dif is " + dif);
-        //if the move is not diagonal, it is illegal
-        //if (dif == 1 || dif == -1) {
-        //System.out.println("Row dif is " + rowDif);
-        //System.out.println("Col dif is " + colDif);
-        //System.out.println(dif);
-        //System.out.println("CCC");
-        //}
-
-        //System.out.println("Row dif is " + rowDif);
-        //System.out.println("Col dif is " + colDif);
-        //System.out.println(dif);
-        //System.out.println("DDD");
 
 
         double dif = (rowDif + 0.0) / colDif;
@@ -269,6 +267,7 @@ public class Piece extends FilledOval {
             //down 1
             if (rowDif == -1) {
                 //over one to either side
+            		hasCaptured = false;
                 return (colDif == 1 || colDif == -1);
             }
 
@@ -278,14 +277,14 @@ public class Piece extends FilledOval {
                 if (colDif == 2) {
                     if (squaresArray[row+1][col-1].getValue() == 2 || squaresArray[row+1][col-1].getValue() == 4) {
                         squaresArray[row+1][col-1].getPiece().captured(squaresArray);
-                        capture = true;
+                        hasCaptured = true;
                         return true;
                     }
                 }
                 else if (colDif == -2) {
                     if (squaresArray[row+1][col+1].getValue() == 2 || squaresArray[row+1][col+1].getValue() == 4) {
                         squaresArray[row+1][col+1].getPiece().captured(squaresArray);
-                        capture = true;
+                        hasCaptured = true;
                         return true;
                     }
                 }
@@ -299,37 +298,54 @@ public class Piece extends FilledOval {
             //up or down 1
             if (rowDif == 1 || rowDif == -1) {
                 //over one to either side
+            		hasCaptured = false;
                 return (colDif == 1 || colDif == -1);
             }
-
-            //down 2
-            else if (rowDif == 2) {
-                if (colDif == 2)
-                    return (squaresArray[row+1][col+1].getValue() == 2 || squaresArray[row+1][col+1].getValue() == 4);
-
-                else
-                    return (squaresArray[row+1][col-1].getValue() == 2 || squaresArray[row+1][col-1].getValue() == 4);
-
-            }
-
-            //up 2
+            
             else if (rowDif == -2) {
-                if (colDif == 2)
-                    return (squaresArray[row-1][col+1].getValue() == 2 || squaresArray[row-1][col+1].getValue() == 4);
-
-                else
-                    return (squaresArray[row-1][col-1].getValue() == 2 || squaresArray[row-1][col-1].getValue() == 4);
-
+                if (colDif == 2) {
+                    if (squaresArray[row+1][col-1].getValue() == 2 || squaresArray[row+1][col-1].getValue() == 4) {
+                        squaresArray[row+1][col-1].getPiece().captured(squaresArray);
+                        hasCaptured = true;
+                        return true;
+                    }
+                }
+                else if (colDif == -2) {
+                    if (squaresArray[row+1][col+1].getValue() == 2 || squaresArray[row+1][col+1].getValue() == 4) {
+                        squaresArray[row+1][col+1].getPiece().captured(squaresArray);
+                        hasCaptured = true;
+                        return true;
+                    }
+                }
             }
+            
+            else if (rowDif == 2) {
+                if (colDif == 2) {
+                    if (squaresArray[row-1][col-1].getValue() == 2 || squaresArray[row-1][col-1].getValue() == 4) {
+                        squaresArray[row-1][col-1].getPiece().captured(squaresArray);
+                        hasCaptured = true;
+                        return true;
+                    }
+                }
+                else if (colDif == -2) {
+                    if (squaresArray[row-1][col+1].getValue() == 2 || squaresArray[row-1][col+1].getValue() == 4) {
+                        squaresArray[row-1][col+1].getPiece().captured(squaresArray);
+                        hasCaptured = true;
+                        return true;
+                    }
+                }
+            }
+            
 
             return false;
         }
-
+        
         //green regular piece
         if (value == 2) {
             //up 1
             if (rowDif == 1) {
                 //over one to either side
+            		hasCaptured = false;
                 return (colDif == 1 || colDif == -1);
             }
 
@@ -338,14 +354,14 @@ public class Piece extends FilledOval {
                 if (colDif == 2) {
                     if (squaresArray[row-1][col-1].getValue() == 1 || squaresArray[row-1][col-1].getValue() == 3) {
                         squaresArray[row-1][col-1].getPiece().captured(squaresArray);
-                        capture = true;
+                        hasCaptured = true;
                         return true;
                     }
                 }
                 else if (colDif == -2) {
                     if (squaresArray[row-1][col+1].getValue() == 1 || squaresArray[row-1][col+1].getValue() == 3) {
                         squaresArray[row-1][col+1].getPiece().captured(squaresArray);
-                        capture = true;
+                        hasCaptured = true;
                         return true;
                     }
                 }
@@ -359,29 +375,43 @@ public class Piece extends FilledOval {
             //up or down 1
             if (rowDif == 1 || rowDif == -1) {
                 //over one to either side
+            		hasCaptured = false;
                 return (colDif == 1 || colDif == -1);
             }
 
-            //down 2
-            else if (rowDif == 2) {
-                if (colDif == 2)
-                    return (squaresArray[row+1][col+1].getValue() == 1 || squaresArray[row+1][col+1].getValue() == 3);
-
-                else
-                    return (squaresArray[row+1][col-1].getValue() == 1 || squaresArray[row+1][col-1].getValue() == 3);
-
-            }
-
-            //up 2
             else if (rowDif == -2) {
-                if (colDif == 2)
-                    return (squaresArray[row-1][col+1].getValue() == 1 || squaresArray[row-1][col+1].getValue() == 3);
-
-                else
-                    return (squaresArray[row-1][col-1].getValue() == 1 || squaresArray[row-1][col-1].getValue() == 3);
-
+                if (colDif == 2) {
+                    if (squaresArray[row+1][col-1].getValue() == 1 || squaresArray[row+1][col-1].getValue() == 3) {
+                        squaresArray[row+1][col-1].getPiece().captured(squaresArray);
+                        hasCaptured = true;
+                        return true;
+                    }
+                }
+                else if (colDif == -2) {
+                    if (squaresArray[row+1][col+1].getValue() == 1 || squaresArray[row+1][col+1].getValue() == 3) {
+                        squaresArray[row+1][col+1].getPiece().captured(squaresArray);
+                        hasCaptured = true;
+                        return true;
+                    }
+                }
             }
-
+            
+            else if (rowDif == 2) {
+                if (colDif == 2) {
+                    if (squaresArray[row-1][col-1].getValue() == 1 || squaresArray[row-1][col-1].getValue() == 3) {
+                        squaresArray[row-1][col-1].getPiece().captured(squaresArray);
+                        hasCaptured = true;
+                        return true;
+                    }
+                }
+                else if (colDif == -2) {
+                    if (squaresArray[row-1][col+1].getValue() == 1 || squaresArray[row-1][col+1].getValue() == 3) {
+                        squaresArray[row-1][col+1].getPiece().captured(squaresArray);
+                        hasCaptured = true;
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 
@@ -391,6 +421,24 @@ public class Piece extends FilledOval {
 
 
 
+   /* public boolean hasValidMove(Square[][] squares) {
+    		if (value == 1) {
+    			if ()
+    		}
+    		
+    		else if (value == 3) {
+    			
+    		}
+    		
+    		else if (value == 2) {
+    			
+    		}
+    		
+    		else if (value == 4) {
+    			
+    		}
+    
+    }*/
 
 
 
@@ -402,42 +450,6 @@ public class Piece extends FilledOval {
 
 
 
-
-	/*
-
-			// Board starts at bottom left as a green square 1,1
-
-	//regular blue pieces
-	if (value == 1) {
-		//if the row is even (1,3,5,7)
-		if (row%2 == 1) {
-			//last col (next to side of board)
-			if (col == 8) {
-				//look only at row+1 and col 7
-			}
-			//any other col
-			else {
-				//look at row+1 and col +/- 1
-			}
-
-		}
-		//if row is odd (2,4,6)
-		else {
-			//first col (next to side)
-			if (col == 1) {
-				//look only at row+1 and col 2
-			}
-			//any other col
-			else {
-				//look at row+1 and col +/- 1
-			}
-		}
-
-	}
-
-
-	return true;
-	*/
 
 
 
@@ -446,3 +458,4 @@ public class Piece extends FilledOval {
 
 
 }
+
