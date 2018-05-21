@@ -1,6 +1,8 @@
 import objectdraw.*;
+
 import java.awt.*;
 import java.util.*;
+
 public class Piece extends FilledOval {
 
     private int value = 0,
@@ -17,7 +19,7 @@ public class Piece extends FilledOval {
     private DrawingCanvas canvas;
 
 
-    private boolean onBoard = true, hasCaptured = false;
+    private boolean onBoard = true, hasCaptured = false, availableCapture = false;
     //if the piece is still alive in the game
     //will be changed to false when it is taken
 
@@ -30,24 +32,21 @@ public class Piece extends FilledOval {
      * row and col are for the coordinates
      */
     public Piece(int value, int row, int col, Location loc, int size, DrawingCanvas canvas) {
-        super (loc, size, size, canvas);
+        super(loc, size, size, canvas);
         //super makes a filled oval, but I made a variable 'circle' to refrer to the oval i will use in the game
         super.removeFromCanvas();
 
-        this.circle = new FilledOval(loc,size,size,canvas);
+        this.circle = new FilledOval(loc, size, size, canvas);
         //kingCircle = new FilledOval(loc, size/2, size/2, canvas);
         if (value == 1) {
             this.circle.setColor(Color.RED);
-        }
-
-        else if (value == 2) {
+        } else if (value == 2) {
             this.circle.setColor(Color.GRAY);
         }
 
-        kingCircle = new FilledOval(loc, 6*size/11.0, 6*size/11.0, canvas);
+        kingCircle = new FilledOval(loc, 6 * size / 11.0, 6 * size / 11.0, canvas);
         kingCircle.setColor(Color.ORANGE);
         kingCircle.hide();
-
 
 
         this.loc = loc;
@@ -102,7 +101,7 @@ public class Piece extends FilledOval {
     public FilledOval getCircle() {
         return circle;
     }
-    
+
     public FilledOval getKingCircle() {
         return kingCircle;
     }
@@ -145,18 +144,17 @@ public class Piece extends FilledOval {
     public void setColor(Color c) {
         circle.setColor(c);
     }
-    
+
     public void king() {
-    			value += 2;
-    			kingCircle.show();
+        value += 2;
+        kingCircle.show();
     }
 
     public void moveTo(Square[][] squares, int row, int col) {
         //Col is x, row is Y
         if ((this.row >= 1 && this.row <= 8) && (this.col >= 1 && this.col <= 8)) {
             squares[this.row][this.col].setValue(0);
-        }
-        else System.out.print("Something went wrong");
+        } else System.out.print("Something went wrong");
         //sets the position of the piece using the square it is on
 
         setRow(row);
@@ -164,17 +162,17 @@ public class Piece extends FilledOval {
         setLoc(col * size, row * size);//squares[row][col].getRow(), squares[row][col].getCol());
 
         circle.moveTo(col * size - size, row * size - size);
-        kingCircle.moveTo((col * size - size) + circle.getWidth()/2.0 - kingCircle.getWidth()/2.0, (row * size - size) + circle.getHeight()/2.0 - kingCircle.getHeight()/2.0);
+        kingCircle.moveTo((col * size - size) + circle.getWidth() / 2.0 - kingCircle.getWidth() / 2.0, (row * size - size) + circle.getHeight() / 2.0 - kingCircle.getHeight() / 2.0);
 
         //sets the value of the square using the piece on the square
         squares[row][col].setValue(value);
         squares[row][col].setPiece(this);
-        
+
         if (value == 1 && row == 8)
-        		this.king();
+            this.king();
         else if (value == 2 && row == 1)
-        		this.king();
-        
+            this.king();
+
     }
 
     public static void startingPos(Piece[][] pieces, Square[][] squares) {
@@ -199,11 +197,12 @@ public class Piece extends FilledOval {
             //if the row is even, set the pieces to col 2, 4, 6 , 8
             else {
                 pieces[0][j].moveTo(squares, row, col);
-                col+=2;
+                col += 2;
             }
         }
 
-        row = 6; col = 1;
+        row = 6;
+        col = 1;
         //red pieces
         for (int j = 0; j < 12; j++) {
             //green pieces only occupy last 3 rows at start
@@ -223,14 +222,12 @@ public class Piece extends FilledOval {
             //if the row is even, set the pieces to col 2, 4, 6 , 8
             else {
                 pieces[1][j].moveTo(squares, row, col);
-                col+=2;
+                col += 2;
             }
         }
 
 
-
     }
-
 
 
     public void captured(Square[][] squaresArray) {
@@ -241,12 +238,12 @@ public class Piece extends FilledOval {
         kingCircle.removeFromCanvas();
     }
 
-    public boolean hasCaptured(){
+    public boolean hasCaptured() {
         return hasCaptured;
     }
 
-    public boolean isValidMove(Square squares, Square[][] squaresArray) {
-        
+    public boolean isValidMove(Square squares, Square[][] squaresArray, boolean concrete) {
+
 
         int rowDif = row - squares.getRow(), colDif = col - squares.getCol();
         System.out.println("Row dif is " + rowDif + ", col dif is " + colDif);
@@ -267,7 +264,8 @@ public class Piece extends FilledOval {
             //down 1
             if (rowDif == -1) {
                 //over one to either side
-            		hasCaptured = false;
+                if (concrete)
+                    hasCaptured = false;
                 return (colDif == 1 || colDif == -1);
             }
 
@@ -275,16 +273,19 @@ public class Piece extends FilledOval {
             //down 2
             else if (rowDif == -2) {
                 if (colDif == 2) {
-                    if (squaresArray[row+1][col-1].getValue() == 2 || squaresArray[row+1][col-1].getValue() == 4) {
-                        squaresArray[row+1][col-1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                    if (squaresArray[row + 1][col - 1].getValue() == 2 || squaresArray[row + 1][col - 1].getValue() == 4) {
+                        if (concrete) {
+                            squaresArray[row + 1][col - 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
-                }
-                else if (colDif == -2) {
-                    if (squaresArray[row+1][col+1].getValue() == 2 || squaresArray[row+1][col+1].getValue() == 4) {
-                        squaresArray[row+1][col+1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                } else if (colDif == -2) {
+                    if (squaresArray[row + 1][col + 1].getValue() == 2 || squaresArray[row + 1][col + 1].getValue() == 4) {
+                        if (concrete) {
+                            squaresArray[row + 1][col + 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
                 }
@@ -298,70 +299,78 @@ public class Piece extends FilledOval {
             //up or down 1
             if (rowDif == 1 || rowDif == -1) {
                 //over one to either side
-            		hasCaptured = false;
+                if (concrete)
+                hasCaptured = false;
                 return (colDif == 1 || colDif == -1);
-            }
-            
-            else if (rowDif == -2) {
+            } else if (rowDif == -2) {
                 if (colDif == 2) {
-                    if (squaresArray[row+1][col-1].getValue() == 2 || squaresArray[row+1][col-1].getValue() == 4) {
-                        squaresArray[row+1][col-1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                    if (squaresArray[row + 1][col - 1].getValue() == 2 || squaresArray[row + 1][col - 1].getValue() == 4) {
+                        if (concrete) {
+                            squaresArray[row + 1][col - 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
+                        return true;
+                    }
+                } else if (colDif == -2) {
+                    if (squaresArray[row + 1][col + 1].getValue() == 2 || squaresArray[row + 1][col + 1].getValue() == 4) {
+                        if (concrete) {
+                            squaresArray[row + 1][col + 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
                 }
-                else if (colDif == -2) {
-                    if (squaresArray[row+1][col+1].getValue() == 2 || squaresArray[row+1][col+1].getValue() == 4) {
-                        squaresArray[row+1][col+1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
-                        return true;
-                    }
-                }
-            }
-            
-            else if (rowDif == 2) {
+            } else if (rowDif == 2) {
                 if (colDif == 2) {
-                    if (squaresArray[row-1][col-1].getValue() == 2 || squaresArray[row-1][col-1].getValue() == 4) {
-                        squaresArray[row-1][col-1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                    if (squaresArray[row - 1][col - 1].getValue() == 2 || squaresArray[row - 1][col - 1].getValue() == 4) {
+                        if (concrete) {
+                            squaresArray[row - 1][col - 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
-                }
-                else if (colDif == -2) {
-                    if (squaresArray[row-1][col+1].getValue() == 2 || squaresArray[row-1][col+1].getValue() == 4) {
-                        squaresArray[row-1][col+1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                } else if (colDif == -2) {
+                    if (squaresArray[row - 1][col + 1].getValue() == 2 || squaresArray[row - 1][col + 1].getValue() == 4) {
+                        if (concrete) {
+                            squaresArray[row - 1][col + 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
                 }
             }
-            
+
 
             return false;
         }
-        
+
         //green regular piece
         if (value == 2) {
             //up 1
             if (rowDif == 1) {
                 //over one to either side
-            		hasCaptured = false;
+                if (concrete) {
+                    hasCaptured = false;
+                }
                 return (colDif == 1 || colDif == -1);
             }
 
             //down 2
             else if (rowDif == 2) {
                 if (colDif == 2) {
-                    if (squaresArray[row-1][col-1].getValue() == 1 || squaresArray[row-1][col-1].getValue() == 3) {
-                        squaresArray[row-1][col-1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                    if (squaresArray[row - 1][col - 1].getValue() == 1 || squaresArray[row - 1][col - 1].getValue() == 3) {
+                        if (concrete) {
+                            squaresArray[row - 1][col - 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
-                }
-                else if (colDif == -2) {
-                    if (squaresArray[row-1][col+1].getValue() == 1 || squaresArray[row-1][col+1].getValue() == 3) {
-                        squaresArray[row-1][col+1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                } else if (colDif == -2) {
+                    if (squaresArray[row - 1][col + 1].getValue() == 1 || squaresArray[row - 1][col + 1].getValue() == 3) {
+                        if (concrete) {
+                            squaresArray[row - 1][col + 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
                 }
@@ -375,39 +384,43 @@ public class Piece extends FilledOval {
             //up or down 1
             if (rowDif == 1 || rowDif == -1) {
                 //over one to either side
-            		hasCaptured = false;
+                if (concrete) {
+                    hasCaptured = false;
+                }
                 return (colDif == 1 || colDif == -1);
-            }
-
-            else if (rowDif == -2) {
+            } else if (rowDif == -2) {
                 if (colDif == 2) {
-                    if (squaresArray[row+1][col-1].getValue() == 1 || squaresArray[row+1][col-1].getValue() == 3) {
-                        squaresArray[row+1][col-1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                    if (squaresArray[row + 1][col - 1].getValue() == 1 || squaresArray[row + 1][col - 1].getValue() == 3) {
+                        if (concrete) {
+                            squaresArray[row + 1][col - 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
+                        return true;
+                    }
+                } else if (colDif == -2) {
+                    if (squaresArray[row + 1][col + 1].getValue() == 1 || squaresArray[row + 1][col + 1].getValue() == 3) {
+                        if (concrete) {
+                            squaresArray[row + 1][col + 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
                 }
-                else if (colDif == -2) {
-                    if (squaresArray[row+1][col+1].getValue() == 1 || squaresArray[row+1][col+1].getValue() == 3) {
-                        squaresArray[row+1][col+1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
-                        return true;
-                    }
-                }
-            }
-            
-            else if (rowDif == 2) {
+            } else if (rowDif == 2) {
                 if (colDif == 2) {
-                    if (squaresArray[row-1][col-1].getValue() == 1 || squaresArray[row-1][col-1].getValue() == 3) {
-                        squaresArray[row-1][col-1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                    if (squaresArray[row - 1][col - 1].getValue() == 1 || squaresArray[row - 1][col - 1].getValue() == 3) {
+                        if (concrete) {
+                            squaresArray[row - 1][col - 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
-                }
-                else if (colDif == -2) {
-                    if (squaresArray[row-1][col+1].getValue() == 1 || squaresArray[row-1][col+1].getValue() == 3) {
-                        squaresArray[row-1][col+1].getPiece().captured(squaresArray);
-                        hasCaptured = true;
+                } else if (colDif == -2) {
+                    if (squaresArray[row - 1][col + 1].getValue() == 1 || squaresArray[row - 1][col + 1].getValue() == 3) {
+                        if (concrete) {
+                            squaresArray[row - 1][col + 1].getPiece().captured(squaresArray);
+                            hasCaptured = true;
+                        }
                         return true;
                     }
                 }
@@ -421,41 +434,87 @@ public class Piece extends FilledOval {
 
 
 
-   /* public boolean hasValidMove(Square[][] squares) {
-    		if (value == 1) {
-    			if ()
+   public ArrayList<Square> validMoves(Square[][] squares, boolean concrete) {
+
+        availableCapture = false;
+
+        ArrayList<Square> allMoves = new ArrayList();
+
+    		if (value == 1 || value == 3 || value == 4) {
+
+                //Moving forward/down
+                //Normal moves
+                if (row+1 >= 1 && row + 1 <= 8) {
+                    if ((col + 1 >= 1 && col + 1 <= 8) && isValidMove(squares[row + 1][col + 1], squares, concrete))
+                        allMoves.add(squares[row + 1][col + 1]);
+
+                    if ((col - 1 >= 1 && col - 1 <= 8) && isValidMove(squares[row + 1][col - 1], squares, concrete))
+                        allMoves.add(squares[row + 1][col - 1]);
+                }
+
+                //Capture moves
+                if (row+2 >= 2 && row + 2 <= 8){
+                    if ((col - 2 >= 1 && col - 2 <= 8) && isValidMove(squares[row + 2][col - 2], squares, concrete)) {
+                        allMoves.add(squares[row + 2][col - 2]);
+                        availableCapture = true;
+                    }
+
+                    if ((col + 2 >= 1 && col + 2 <= 8) && isValidMove(squares[row + 2][col + 2], squares, concrete)) {
+                        allMoves.add(squares[row + 2][col + 2]);
+                        availableCapture = true;
+                    }
+                }
     		}
-    		
-    		else if (value == 3) {
-    			
-    		}
-    		
-    		else if (value == 2) {
-    			
-    		}
-    		
-    		else if (value == 4) {
-    			
-    		}
-    
-    }*/
+
+    		 if (value == 3 || value == 2 || value == 4) {
 
 
 
+                //Moving forward/down
+                //Normal moves
+                if (row -1 >= 1 && row - 1 <= 8) {
+                    if ((col + 1 >= 1 && col + 1 <= 8) && isValidMove(squares[row + 1][col + 1], squares, concrete))
+                        allMoves.add(squares[row + 1][col + 1]);
+
+                    if ((col - 1 >= 1 && col - 1 <= 8) && isValidMove(squares[row + 1][col - 1], squares, concrete))
+                        allMoves.add(squares[row + 1][col - 1]);
+                }
+
+                //Capture move
+                if (row-2 >= 1 && row - 2 <= 8){
+                    if ((col - 2 >= 1 && col - 2 <= 8) && isValidMove(squares[row + 2][col - 2], squares, concrete)) {
+                        allMoves.add(squares[row + 2][col - 2]);
+                        availableCapture = true;
+                    }
+
+                    if ((col + 2 >= 1 && col + 2 <= 8) && isValidMove(squares[row + 2][col + 2], squares, concrete)) {
+                        allMoves.add(squares[row + 2][col + 2]);
+                        availableCapture = true;
+                    }
+                }
 
 
 
+            }
 
+            return allMoves;
 
+    }
 
+    public boolean hasValidCapture(Square[][] squares){
+        ArrayList<Square> moves = validMoves(squares, false);
 
+       if (hasCaptured) {
+            for (int n = 0; n < moves.size(); n++) {
+                int diff = Math.abs(moves.get(n).getRow() - row);
+                System.out.println(diff);
+                if (diff == 2)
+                    return true;
+            }
+        }
+        return (hasCaptured && availableCapture);
 
-
-
-
-
-
+    }
 
 
 }
-
