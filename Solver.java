@@ -31,7 +31,7 @@ public class Solver {
             }
             //Runs uniqueSolve once for each possible value
             for (int v = 1; v <= 9; v++) {
-                uniqueSolve(v);
+           //     uniqueSolve(v);
             }
             System.out.println(count);
         }
@@ -51,7 +51,7 @@ public class Solver {
  //               System.out.println(v+" "+c);
                 if (posValues.get(v) == values[row][c] && values[row][c] != 0) {
                     posValues.remove(v);
-                    v--;
+
                     removed = true;
                 }
             }
@@ -60,7 +60,7 @@ public class Solver {
 //                System.out.println(v+" "+r);
                     if (posValues.get(v) == values[r][col] && values[r][col] != 0) {
                         posValues.remove(v);
-                        v--;
+
                         removed = true;
                     }
                 }
@@ -72,7 +72,7 @@ public class Solver {
 //                        System.out.println(v+" "+r+" "+c);
                         if (values[r][c] == posValues.get(v) && values[r][c] != 0) {
                             posValues.remove(v);
-                            v--;
+
                             removed = true;
                         }
 
