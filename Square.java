@@ -16,6 +16,7 @@ public class Square {
     private ArrayList<Integer> posVals = new ArrayList<Integer>();
 
 
+
     public Square(int v, int c, int r, double x, double y, double s){
         value = v;
         row = r;
@@ -25,10 +26,13 @@ public class Square {
         //canvas = c;
         point = new Location(x,y);
 
+
+
         //box = new FramedRect(point, size, size, canvas);
     }
 
     public Square(int value, Location point, double s) {
+
         size = s;
         //canvas = c;
         this.point = new Location(point.getX(), point.getY());

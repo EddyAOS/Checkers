@@ -6,7 +6,8 @@ public class Solver {
 
     private GameBoard board;
     private int[][] values;
-    private boolean found;
+    private boolean repeat,found;
+
 
 
     public Solver(GameBoard gBoard) {
@@ -35,9 +36,7 @@ public class Solver {
     //soleSolve checks the possible values of a given square by eliminating all values that are already present in the square's row, column, and box
     public void soleSolve(int row, int col) {
         ArrayList<Integer> posValues = board.getSquare(row, col).getPossibleValues();
-        for (int v = 0; v < 9; v++) {
-            posValues.add(v + 1);
-        }
+
         for (int v = 8; v >= 0; v--) {
             boolean removed = false;
             for (int c = 0; c < 9; c++) {
@@ -72,6 +71,7 @@ public class Solver {
             values[row][col] = posValues.get(0);
             board.getSquare(row, col).setValue(posValues.get(0));
             found = true;
+            System.out.println("found value");
         } else board.getSquare(row, col).setPossibleValues(posValues);
 
 
@@ -79,7 +79,7 @@ public class Solver {
 
     //Solves based on eliminating possible locations for a certain value in each row, column, and box
     public void uniqueSolve(int value) {
-        boolean repeat = false;
+        repeat = false;
         //all possible squares on the Sudoku grid
         ArrayList<Square> posSquares = new ArrayList<Square>();
 
@@ -108,7 +108,7 @@ public class Solver {
                 }
 
             }
-            for (int j = posSquares.size() - 1; j >= 0; j++) {
+            for (int j = posSquares.size() - 1; j >= 0; j--) {
                 boolean rowSame = false;
                 boolean colSame = false;
                 boolean boxSame = false;
@@ -125,6 +125,7 @@ public class Solver {
                 if (!(rowSame) || !(colSame) || !(boxSame)) {
                     System.out.println("found value");
                     repeat = true;
+                    found = true;
                     board.getSquare(posSquares.get(j).getRow(), posSquares.get(j).getCol()).setValue(k.getValue());
                 }
 
@@ -132,15 +133,12 @@ public class Solver {
         }
         if (repeat) {
             uniqueSolve(value);
-            found = true;
         }
 
 
     }
 
-    public boolean numberFound() {
-        return found;
-    }
+
 
     public void gridInteraction() {
         for (int b = 1; b <= 9; b++) {

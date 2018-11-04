@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class GameBoard extends Board {
 
     private int numsLeft;
@@ -8,6 +10,7 @@ public class GameBoard extends Board {
     }
 
     public void makePuzzle(String s) {
+
         int subtractNums = 0;
         switch (s) {
             case "beginner":
@@ -29,7 +32,7 @@ public class GameBoard extends Board {
             int randX = (int) (Math.random() * 9);
             int randY = (int) (Math.random() * 9);
             super.grid[randX][randY].setValue(0);
-            ;
+            super.grid[randX][randY].setPossibleValues(new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,9)));
             subtractNums--;
             numsLeft++;
         }
