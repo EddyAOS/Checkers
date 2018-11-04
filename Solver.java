@@ -112,19 +112,21 @@ public class Solver {
                 boolean rowSame = false;
                 boolean colSame = false;
                 boolean boxSame = false;
-                for (int l = posSquares.size() - 1; l >= 0; l--) {
+                for (int l = valSquares.size()-1; l >= 0; l--) {
 
 
-                    if (posSquares.get(j).getRow() == posSquares.get(l).getRow())
+                    if (posSquares.get(j).getRow() == valSquares.get(l).getRow())
                         rowSame = true;
-                    if (posSquares.get(j).getCol() == posSquares.get(l).getCol())
+                    if (posSquares.get(j).getCol() == valSquares.get(l).getCol())
                         colSame = true;
-                    if (posSquares.get(j).getBox() == posSquares.get(l).getBox())
+                    if (posSquares.get(j).getBox() == valSquares.get(l).getBox())
                         boxSame = true;
                 }
-                if (!(rowSame) || !(colSame) || boxSame)
+                if (!(rowSame) || !(colSame) || !(boxSame)) {
+                    System.out.println("found value");
                     repeat = true;
-                board.getSquare(posSquares.get(j).getRow(), posSquares.get(j).getCol()).setValue(k.getValue());
+                    board.getSquare(posSquares.get(j).getRow(), posSquares.get(j).getCol()).setValue(k.getValue());
+                }
 
             }
         }
