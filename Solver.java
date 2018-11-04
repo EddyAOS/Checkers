@@ -31,7 +31,7 @@ public class Solver {
             }
             //Runs uniqueSolve once for each possible value
             for (int v = 1; v <= 9; v++) {
-           //     uniqueSolve(v);
+                //     uniqueSolve(v);
             }
             System.out.println(count);
         }
@@ -45,55 +45,55 @@ public class Solver {
 
         //Runs method only if there are multiple possible values for the given square
         if (posValues.size()>1)
-        for (int v = posValues.size()-1; v >= 0; v--) {
-            boolean removed = false;
-            for (int c = 0; c < 9 && !(removed); c++) {
- //               System.out.println(v+" "+c);
-                if (posValues.get(v) == values[row][c] && values[row][c] != 0) {
-                    posValues.remove(v);
-
-                    removed = true;
-                }
-            }
-            if (!(removed))
-                for (int r = 0; r < 9 && !(removed); r++) {
-//                System.out.println(v+" "+r);
-                    if (posValues.get(v) == values[r][col] && values[r][col] != 0) {
+            for (int v = posValues.size()-1; v >= 0; v--) {
+                boolean removed = false;
+                for (int c = 0; c < 9 && !(removed); c++) {
+                    //               System.out.println(v+" "+c);
+                    if (posValues.get(v) == values[row][c] && values[row][c] != 0) {
                         posValues.remove(v);
 
                         removed = true;
                     }
                 }
-            if (!(removed)) {
-                int rSet = row / 3;
-                int cSet = col / 3;
-                for (int r = rSet * 3; r < rSet * 3 + 3 && !(removed); r++) {
-                    for (int c = cSet * 3; c < cSet * 3 + 3 && !(removed); c++) {
-//                        System.out.println(v+" "+r+" "+c);
-                        if (values[r][c] == posValues.get(v) && values[r][c] != 0) {
+                if (!(removed))
+                    for (int r = 0; r < 9 && !(removed); r++) {
+//                System.out.println(v+" "+r);
+                        if (posValues.get(v) == values[r][col] && values[r][col] != 0) {
                             posValues.remove(v);
 
                             removed = true;
                         }
+                    }
+                if (!(removed)) {
+                    int rSet = row / 3;
+                    int cSet = col / 3;
+                    for (int r = rSet * 3; r < rSet * 3 + 3 && !(removed); r++) {
+                        for (int c = cSet * 3; c < cSet * 3 + 3 && !(removed); c++) {
+//                        System.out.println(v+" "+r+" "+c);
+                            if (values[r][c] == posValues.get(v) && values[r][c] != 0) {
+                                posValues.remove(v);
 
+                                removed = true;
+                            }
+
+                        }
                     }
                 }
+
+
             }
-
-
-        }
         if (posValues.size() == 1) {
             values[row][col] = posValues.get(0);
             board.getSquare(row, col).setValue(posValues.get(0));
-          found = true;
-           System.out.println("found value");
+            found = true;
+            System.out.println("found value");
         } else if (posValues.size() > 1) board.getSquare(row, col).setPossibleValues(posValues);
 
 
     }
 
     //Solves based on eliminating possible locations for a certain value in each row, column, and box
-    public void uniqueSolve(int value) {
+    /*public void uniqueSolve(int value) {
         repeat = false;
         //all possible squares on the Sudoku grid
         ArrayList<Square> posSquares = new ArrayList<Square>();
@@ -142,22 +142,20 @@ public class Solver {
                     if (!(posSquares.get(i).compareTo(posSquares.get(j)))){
                         //Compares square j to all the other possible squares that could have the given value
                         //Checks for possible squares in the same column
-                            if (posSquares.get(j).getCol() == posSquares.get(i).getCol())
-                                colSame = true;
-                            //Checks for possible squares in the same row
-                            if (posSquares.get(j).getRow() == posSquares.get(i).getRow())
-                                rowSame = true;
-                            //Checks for possible squares in the same box
-                            if (posSquares.get(j).getBox() == posSquares.get(i).getBox())
-                                boxSame = true;
+                        if (posSquares.get(j).getCol() == posSquares.get(i).getCol())
+                            colSame = true;
+                        //Checks for possible squares in the same row
+                        if (posSquares.get(j).getRow() == posSquares.get(i).getRow())
+                            rowSame = true;
+                        //Checks for possible squares in the same box
+                        if (posSquares.get(j).getBox() == posSquares.get(i).getBox())
+                            boxSame = true;
 
-                        }
                     }
+                }
 
                /* for (int l = valSquares.size()-1; l >= 0; l--) {
-
                     for (int c = 0; c < 9; c++){
-
                     }
                     if (posSquares.get(j).getRow() == valSquares.get(l).getRow())
                         rowSame = true;
@@ -165,14 +163,13 @@ public class Solver {
                         colSame = true;
                     if (posSquares.get(j).getBox() == valSquares.get(l).getBox())
                         boxSame = true;
-
-                }*/
-               //If there is either no other square with the same possible value in the same row, box, or column, then a solution has been found
+                }
+                //If there is either no other square with the same possible value in the same row, box, or column, then a solution has been found
                 if (!(rowSame) || !(colSame) || !(boxSame)) {
                     //Prints if a solution to possible square j is found
 //                    System.out.println("found value");
                     //Boolean signals to repeat the method
-                   // repeat = true;
+                    // repeat = true;
 //                   found = true;
                     //Changes the value on the board
                     board.getSquare(posSquares.get(j).getRow(), posSquares.get(j).getCol()).setValue(k.getValue());
@@ -183,12 +180,13 @@ public class Solver {
             }
         }
         //Recursion
-       /* if (repeat) {
+       if (repeat) {
             uniqueSolve(value);
-        }*/
+        }
 
 
     }
+    */
 
 
 
