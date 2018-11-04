@@ -32,7 +32,12 @@ public class GameBoard extends Board {
             int randX = (int) (Math.random() * 9);
             int randY = (int) (Math.random() * 9);
             super.grid[randX][randY].setValue(0);
-            super.grid[randX][randY].setPossibleValues(new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,9)));
+            ArrayList<Integer> posVals = new ArrayList<Integer>();
+            for (int v = 1; v < 10; v++){
+                posVals.add(v);
+            }
+            super.grid[randX][randY].setPossibleValues(posVals);
+
             subtractNums--;
             numsLeft++;
         }

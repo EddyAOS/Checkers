@@ -42,6 +42,7 @@ public class Square {
 
     public void setValue(int v){
         value = v;
+        posVals.clear();
     }
 
     public int getValue(){
@@ -88,6 +89,10 @@ public class Square {
             if (cSet == 1) return 8;
             return 9;
         }
-        }
+    }
 
+
+    public boolean compareTo(Square sq) {
+        return (this.row == sq.getRow() && this.col == sq.getCol());
+    }
 }
