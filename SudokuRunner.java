@@ -10,21 +10,12 @@ public class SudokuRunner extends WindowController {
 
     public static void main(String[] args){
 
-
  //       sudoku.printValues();
         System.out.println(sudoku);
-        sudoku.makePuzzle("hard");
-
+        sudoku.makePuzzle("easy");
         System.out.println(sudoku);
-
-        Solver solution = new Solver(sudoku);
-
-        solution.Solve();
-        System.out.println(sudoku);
-
-
-
-
+        sudoku.play();
+        
     }
 
     public void begin() {
