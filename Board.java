@@ -15,7 +15,7 @@ public class Board {
 
         for (int j = 0; j < grid.length; j++) {
             for (int k = 0; k < grid[0].length; k++) {
-                grid[j][k] = new Square(value, x + (size / 9 * k), y + (size / 9 * j), size / 9);
+                grid[j][k] = new Square(value, j, k, x + (size / 9 * k), y + (size / 9 * j), size / 9);
             }
         }
         assignValues();
@@ -130,6 +130,8 @@ public class Board {
     public Square getSquare(int row, int col){
         return grid[row][col];
     }
+
+
 
 
 

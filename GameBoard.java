@@ -20,14 +20,14 @@ public class GameBoard extends Board {
                 subtractNums = (int) (31 + Math.random() * 9);
                 break;
             case "hard":
-                subtractNums = (int) (21 + Math.random() * 9);
+                subtractNums = (int) (25 + Math.random() * 9);
                 break;
             default:
                 return;
         }
         while (subtractNums > 0) {
-            int randX = (int) Math.random() * 9;
-            int randY = (int) Math.random() * 9;
+            int randX = (int) (Math.random() * 9);
+            int randY = (int) (Math.random() * 9);
             super.grid[randX][randY].setValue(0);
             ;
             subtractNums--;
