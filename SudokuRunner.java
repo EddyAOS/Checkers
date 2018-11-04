@@ -13,7 +13,7 @@ public class SudokuRunner extends WindowController {
 
  //       sudoku.printValues();
         System.out.println(sudoku);
-        sudoku.makePuzzle("easy");
+        sudoku.makePuzzle("hard");
 
         System.out.println(sudoku);
 
